@@ -128,5 +128,46 @@ public class JsonToXmlConverter {
         } catch (Exception e) {
             throw new RuntimeException("Error occurred while saving XML to file", e);
         }
+        
+        
+        
+        
+        
+        
+        
+        import org.apache.commons.lang3.StringEscapeUtils;
+
+// ...
+
+private static void addJsonToXmlElement(JSONObject jsonObject, Element element) {
+    for (String key : jsonObject.keySet()) {
+        Object value = jsonObject.get(key);
+        if (value instanceof JSONObject) {
+            Element childElement = element.getOwnerDocument().createElement(key);
+            addJsonToXmlElement((JSONObject) value, childElement);
+            element.appendChild(childElement);
+        } else if (value instanceof JSONArray) {
+            for (Object arrayItem : (JSONArray) value) {
+                if (arrayItem instanceof JSONObject) {
+                    Element childElement = element.getOwnerDocument().createElement(key);
+                    addJsonToXmlElement((JSONObject) arrayItem, childElement);
+                    element.appendChild(childElement);
+                } else {
+                    Element childElement = element.getOwnerDocument().createElement(key);
+                    String escapedValue = StringEscapeUtils.escapeXml10(arrayItem.toString());
+                    childElement.setTextContent(escapedValue);
+                    element.appendChild(childElement);
+                }
+            }
+        } else {
+            Element childElement = element.getOwnerDocument().createElement(key);
+            String escapedValue = StringEscapeUtils.escapeXml10(value.toString());
+            childElement.setTextContent(escapedValue);
+            element.appendChild(childElement);
+        }
+    }
+}
+
+        
     }
 }
