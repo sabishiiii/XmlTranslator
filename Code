@@ -1,0 +1,54 @@
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+
+public class OneOfDeserializer<T> implements JsonDeserializer<T> {
+    private Gson gson;
+
+    public OneOfDeserializer(Gson gson) {
+        this.gson = gson;
+    }
+
+    @Override
+    public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (json.isJsonObject()) {
+            JsonObject jsonObject = json.getAsJsonObject();
+            if (jsonObject.has("oneOf")) {
+                JsonArray oneOfArray = jsonObject.getAsJsonArray("oneOf");
+                for (JsonElement element : oneOfArray) {
+                    JsonObject schemaObject = element.getAsJsonObject();
+                    String schemaType = schemaObject.get("type").getAsString();
+
+                    // Adjust this logic based on the types in your JSON schema
+                    switch (schemaType) {
+                        case "object":
+                            // Deserialize the object using Gson's default deserializer
+                            return gson.fromJson(json, typeOfT);
+                        case "string":
+                            // Deserialize the string using Gson's default deserializer
+                            return gson.fromJson(json, typeOfT);
+                        // Add cases for other types as per your JSON schema
+                        default:
+                            // Handle unknown schema types or return null as per your requirements
+                            return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    // Example usage
+    public static void main(String[] args) {
+        String json = "{\"oneOf\": [{\"type\": \"object\", \"properties\": {\"name\": {\"type\": \"string\"}}}, {\"type\": \"string\"}]}";
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Object.class, new OneOfDeserializer<>(gsonBuilder.create()));
+        Gson gson = gsonBuilder.create();
+
+        Type targetType = new TypeToken<Object>() {}.getType();
+        Object deserializedObject = gson.fromJson(json, targetType);
+        System.out.println(deserializedObject);
+    }
+}
