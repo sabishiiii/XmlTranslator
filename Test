@@ -1,0 +1,60 @@
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+public class TranslatorControllerTest {
+    private MockMvc mockMvc;
+
+    @Mock
+    private TranslatorService translatorService;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+        TranslatorController translatorController = new TranslatorController(translatorService);
+        mockMvc = MockMvcBuilders.standaloneSetup(translatorController).build();
+    }
+
+    @Test
+    public void testJsonToXmlConversion() throws Exception {
+        String json = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+        String expectedXml = "<root><name>John</name><age>30</age><city>New York</city></root>";
+
+        when(translatorService.jsonToXml(json)).thenReturn(expectedXml);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/json-to-xml")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedXml))
+                .andReturn();
+
+        verify(translatorService, times(1)).jsonToXml(json);
+    }
+
+    @Test
+    public void testXmlToJsonConversion() throws Exception {
+        String xml = "<root><name>John</name><age>30</age><city>New York</city></root>";
+        String expectedJson = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+
+        when(translatorService.xmlToJson(xml)).thenReturn(expectedJson);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/xml-to-json")
+                .contentType(MediaType.APPLICATION_XML)
+                .content(xml))
+                .andExpect(status().isOk())
+                .andExpect(content().string(expectedJson))
+                .andReturn();
+
+        verify(translatorService, times(1)).xmlToJson(xml);
+    }
+}
