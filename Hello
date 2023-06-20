@@ -1,0 +1,57 @@
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+public class TranslatorServiceImplTest {
+    private static final String INPUT_DIRECTORY = "Input";
+    private static final String JSON_INPUT_FILE = "jsonInput.json";
+
+    @BeforeAll
+    public static void setup() throws IOException {
+        // Create the Input directory if it doesn't exist
+        Path inputDirectory = Paths.get(INPUT_DIRECTORY);
+        if (!Files.exists(inputDirectory)) {
+            Files.createDirectory(inputDirectory);
+        }
+
+        // Save the input JSON in the Input directory as "jsonInput.json"
+        String jsonInput = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+        Path inputFile = inputDirectory.resolve(JSON_INPUT_FILE);
+        Files.write(inputFile, jsonInput.getBytes());
+    }
+
+    @Test
+    public void testJsonToXmlConversion() {
+        // Expected XML output
+        String expectedXml = "<root><name>John</name><age>30</age><city>New York</city></root>";
+
+        // Create an instance of the TranslatorServiceImpl
+        TranslatorServiceImpl translatorService = new TranslatorServiceImpl();
+
+        // Perform the JSON to XML conversion
+        translatorService.jsonToXml();
+
+        // Read the generated XML from the Output directory
+        String actualXml = readOutputFile("output.xml");
+
+        // Assert the expected XML output
+        Assertions.assertEquals(expectedXml, actualXml);
+    }
+
+    // ...
+
+    private String readOutputFile(String filename) {
+        try {
+            Path outputFile = Paths.get("Output", filename);
+            return Files.readString(outputFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
