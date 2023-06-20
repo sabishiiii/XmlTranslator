@@ -1,0 +1,32 @@
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class TranslatorServiceImplTest {
+    private TranslatorService translatorService;
+
+    @BeforeEach
+    public void setup() {
+        translatorService = new TranslatorServiceImpl();
+    }
+
+    @Test
+    public void testJsonToXmlConversion() {
+        String json = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+        String expectedXml = "<root><name>John</name><age>30</age><city>New York</city></root>";
+
+        String convertedXml = translatorService.jsonToXml(json);
+
+        Assertions.assertEquals(expectedXml, convertedXml);
+    }
+
+    @Test
+    public void testXmlToJsonConversion() {
+        String xml = "<root><name>John</name><age>30</age><city>New York</city></root>";
+        String expectedJson = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
+
+        String convertedJson = translatorService.xmlToJson(xml);
+
+        Assertions.assertEquals(expectedJson, convertedJson);
+    }
+}
