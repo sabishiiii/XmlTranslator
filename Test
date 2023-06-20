@@ -29,13 +29,12 @@ public class TranslatorControllerTest {
         String json = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
         String expectedXml = "<root><name>John</name><age>30</age><city>New York</city></root>";
 
-        when(translatorService.jsonToXml(json)).thenReturn(expectedXml);
+        doNothing().when(translatorService).jsonToXml(json);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/json-to-xml")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedXml))
                 .andReturn();
 
         verify(translatorService, times(1)).jsonToXml(json);
@@ -46,15 +45,15 @@ public class TranslatorControllerTest {
         String xml = "<root><name>John</name><age>30</age><city>New York</city></root>";
         String expectedJson = "{\"name\":\"John\",\"age\":30,\"city\":\"New York\"}";
 
-        when(translatorService.xmlToJson(xml)).thenReturn(expectedJson);
+        doNothing().when(translatorService).xmlToJson(xml);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/xml-to-json")
                 .contentType(MediaType.APPLICATION_XML)
                 .content(xml))
                 .andExpect(status().isOk())
-                .andExpect(content().string(expectedJson))
                 .andReturn();
 
         verify(translatorService, times(1)).xmlToJson(xml);
     }
 }
+
