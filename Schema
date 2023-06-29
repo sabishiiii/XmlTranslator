@@ -10,7 +10,22 @@
     "email": {
       "type": "string",
       "format": "email"
+    },
+    "address": {
+      "type": "object",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      },
+      "required": ["street", "city", "country"]
     }
   },
-  "required": ["name", "email"]
+  "required": ["name", "email", "address"]
 }
